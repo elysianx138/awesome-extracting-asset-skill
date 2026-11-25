@@ -1,0 +1,16 @@
+{
+  "id": "your-new-style-id",
+  "name": "新风格中文名（例如：生物实验室搪瓷风 / 奶油磨砂手帐风 / 微缩海岛风）",
+  "en": "Your New Style Name",
+  "domain": "ui | 3d | 2d | audio",
+  "source": "Origin project & files",
+  "tokens": {
+    "primary": "#245b60",
+    "surface": "#faf5e9",
+    "ink": "#203c40",
+    "accent": "#78519c"
+  },
+  "files": {
+    "theme": "styles/your-new-style-id/theme.css"
+  }
+}
