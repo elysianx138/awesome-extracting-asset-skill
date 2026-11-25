@@ -2,34 +2,55 @@
 
 [English](./README.md)
 
-**别再让 AI 盲扫你的旧项目仓库把上下文撑爆了。**
+**把做完的游戏/项目抽成底座与皮肤分离、行号级检索、零 PNG 实时陈列室的 AI Agent Skill。**
 
 `extracting-asset-skill` 是一个面向 AI 编程助手（Claude Code、Antigravity、Cursor、Codex 等）的开源 **元技能（Meta-Skill）**。它能把任意做完的游戏或创意项目里的可复用资产（程序化 3D/2D 模型、Shader、UI 交互骨架、音效引擎、特效库），标准化抽成**可精准检索、底座与皮肤解耦、带零图片实时陈列室**的 Agent Skill。
 
 ---
 
-## 解决什么痛点？
+## 实战效果展示（从 3 款独立 Web 游戏中真实抽离）
 
-用 AI 连做多款游戏或创意项目时，复用旧代码通常会踩中三个坑：
+> **说明**：下方截图仅用于 README 展示；抽出来的 Skill 目录内部**不存任何 `.png` 缩略图**——人看实时交互网页，AI 只查 JSON 行号索引。
 
-1. **上下文瞬间爆炸**：直接让 AI 读旧仓库，它还没写一行新代码，Token 先烧掉一半、开始健忘降智。
-2. **画风与业务强耦合**：配色、比例、i18n 和旧游戏状态全粘在组件里，直接拷贝要么编译报错，要么新游戏长出一张旧游戏的脸。
-3. **人眼看不见、图库装不下**：隔几个月自己都忘了某个模型/组件长什么样，但往 Skill 目录塞几十张 `.png` 截图又会撑爆包体与上下文。
+| Web 游戏 UI 陈列室（支持一键实时换肤） | 程序化 3D 资产陈列室（44 个 Three.js 组件） |
+| :---: | :---: |
+| ![Web Game UI Showroom](./assets/ui-showroom.jpg) | ![3D Asset Showroom](./assets/3d-showroom.jpg) |
+| *抽自《DNA EVOLUTION》与《月光小镇》（`enamel-lab` + `cozy-glass` 双皮肤）* | *抽自《浮岛记》（44 个无 UV 顶点色 Three.js 资产）* |
 
-## 核心设计（4 大支柱）
+---
 
-1. **动手前静默扫描与对齐门控（`Step 0`）**
-   - 先扫描旧项目，自动区分**高价值可复用资产**与**项目业务胶水**；
-   - 动手前必问 4 个问题：**抽取范围、新建还是增量合并进老库、长期维护路径（中央资产库）、交付物清单**，确认后再写文件。
-2. **通用底座 + 可插拔风格包（Universal Base + Style Pack）**
-   - 剥离旧项目的业务 `import`，将纯逻辑/几何骨架抽进 `templates/`（标记 `"style": "universal"`）；
-   - 将色板、比例、光照、CSS 变量独立放进 `styles/<style-id>/`，同一领域 Skill（如 UI 或 3D）可跨游戏一键换肤、增量滚雪球。
-3. **行号级 CLI 检索（`assets-catalog.json` + `search_assets.py`）**
-   - AI 先跑检索脚本拿到精确的 `文件#L行号`，只读命中的几十行代码，彻底告别盲扫；
-   - `--sync-lines` 支持 JS/TS 导出、CSS 选择器与 Python 定义的自动行号校验，保证 0 失效路径。
-4. **零 PNG 实时交互陈列室（`showroom/gallery.html`）**
-   - Skill 目录内不留一张 `.png` 截图；
-   - 人类打开浏览器直接运行真实源码查看 3D 旋转 / 试按 UI 按钮 / 一键切皮肤，AI 永远只查 JSON 索引，互不打扰。
+## 对比：直接喂旧仓库 vs. 使用 `extracting-asset-skill`
+
+| 痛点 | 直接让 AI 读旧项目 | 使用 `extracting-asset-skill` |
+| :--- | :--- | :--- |
+| **上下文消耗** | AI 盲扫几十个文件，还没写新代码 Token 先烧掉一半 | AI 跑一句 `search_assets.py`，只读命中的 `#L行号` 代码块 |
+| **风格与业务耦合** | 配色、比例与旧游戏逻辑（`i18n`、战斗状态）全粘在一起 | 强制拆分**通用底座（`templates/`）** + **可插拔皮肤（`styles/<id>/`）** |
+| **视觉预览** | 隔半年忘了模型长啥样，塞 `.png` 截图又会把包体撑爆 | **零 PNG 实时陈列室（`showroom/gallery.html`）**，改完代码刷新即看 |
+| **跨项目增量沉淀** | 每个游戏重复建库、互相冲突 | 按领域合并进同一资产库 + `--sync-lines` 校验行号 0 警告 |
+
+---
+
+## 核心工作流
+
+```text
+旧游戏项目 ──▶ [Step 0: 静默扫描 + 4 问对齐门控]
+                   │
+                   ├──▶ 自动跳过业务胶水（存档 / 剧情 / 渠道 SDK）
+                   │
+                   ├──▶ templates/（通用底座，剥离外部 import）
+                   ├──▶ styles/<id>/（色板、CSS 变量、光照后期参数）
+                   ├──▶ assets-catalog.json + scripts/search_assets.py（--sync-lines）
+                   └──▶ showroom/gallery.html（零 PNG 浏览器实时陈列室）
+```
+
+### 终端检索实拍
+
+```bash
+$ python scripts/search_assets.py --q spring
+Matched 2 UI asset(s):
+- [interaction | universal] 弹簧按钮按压反馈 (Event-Driven Spring Button Feedback) -> templates/core/button-feedback.js#L4 `initializeButtonFeedback`
+    Zero game-loop overhead spring press/rebound micro-interaction using Web Animations API with reduced-motion and keyboard support.
+```
 
 ---
 
@@ -72,7 +93,7 @@ python skills/extracting-asset-skill/scripts/pack_and_sync_skill.py \
 
 ```text
 skills/extracting-asset-skill/
-├── SKILL.md                           # 核心流程与 Step 0 对齐门控
+├── SKILL.md                           # 核心流程与 Step 0 对齐门控（< 80 行）
 ├── references/
 │   ├── style-pack-pattern.md          # 底座+皮肤分离与零 PNG 陈列室架构说明
 │   └── skill-spec-checklist.md        # Token 经济性与 SKILL.md 规范清单

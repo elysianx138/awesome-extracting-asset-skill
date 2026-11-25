@@ -2,32 +2,55 @@
 
 [中文说明](./README.zh.md)
 
-**Stop letting AI coding agents blindly scan your old repos and blow up the context window.**
+**Turn finished games & projects into searchable, style-decoupled AI Agent Skills — zero context bloat, zero PNGs.**
 
 `extracting-asset-skill` is an open-source **Meta-Skill** for AI coding agents (Claude Code, Antigravity, Cursor, Codex, etc.) that extracts reusable technical and creative assets from any finished project—procedural 3D/2D models, shaders, UI primitives, audio engines, or effect libraries—into a clean, searchable, style-decoupled **Agent Skill**.
 
 ---
 
-## Why This Exists
+## Showcase (Real Outputs Extracted from 3 Indie Web Games)
 
-When you build multiple games or creative projects with AI, reusing code from previous projects usually fails in three ways:
+> **Note:** Screenshots below are for this README only. Inside the generated Skills themselves, **zero `.png` thumbnails are stored**—humans browse live interactive HTML showrooms while AI agents query JSON indexes.
 
-1. **Context Window Explosion**: Pointing an AI agent to an old repo makes it scan dozens of files before writing a single line of new code.
-2. **Style & Business-Glue Lock-In**: Colors, proportions, i18n, and old game state are tangled inside components—reusing them either breaks builds or makes your new project look identical to the old one.
-3. **Thumbnail Bloat**: Humans forget what 40 procedural models or UI components look like, yet stuffing dozens of `.png` screenshots inside a Skill bloats the package and wastes tokens.
+| Web Game UI Showroom (Multi-Theme Live Switcher) | Procedural 3D Showroom (44 Three.js Assets) |
+| :---: | :---: |
+| ![Web Game UI Showroom](./assets/ui-showroom.jpg) | ![3D Asset Showroom](./assets/3d-showroom.jpg) |
+| *Extracted from DNA EVOLUTION & Moonlight Town (`enamel-lab` + `cozy-glass`)* | *Extracted from Drift Diary (44 vertex-colored Three.js assets, zero UVs)* |
 
-## Core Design (4 Pillars)
+---
 
-1. **Silent Scan & Alignment Gate (`Step 0`)**
-   - Scans the source project first, separates **High-Value Reusable Assets** from **Project-Specific Glue**, and asks 4 short questions before writing a single file: *Scope, Mode (new domain Skill vs. incremental merge), Maintenance Path (Central Asset Vault), and Deliverables*.
-2. **Universal Base + Pluggable Style Pack**
-   - Strips project-specific imports into options/callbacks (`templates/`, tagged `"style": "universal"`).
-   - Moves palettes, proportions, lighting, and CSS tokens into swappable `styles/<style-id>/` packs so one domain Skill can serve many distinct games.
-3. **Line-Exact CLI Search (`assets-catalog.json` + `search_assets.py`)**
-   - Instead of scanning whole folders, AI runs `search_assets.py` to get exact `file#Lline` pointers and reads only the matched block.
-   - Supports `--sync-lines` verification across JS/TS exports, CSS selectors, and Python definitions with 0 warnings.
-4. **Zero-PNG Live Interactive Showroom (`showroom/gallery.html`)**
-   - Zero `.png` thumbnails inside the Skill. Humans open a live local HTML showroom importing the real `templates/` and `styles/` (with live theme switching or 3D orbit controls), while AI queries JSON only.
+## Before vs. After
+
+| Pain Point | Pointing AI to an Old Repo | Using `extracting-asset-skill` |
+| :--- | :--- | :--- |
+| **Context Window** | AI scans 30+ files and burns half its context before coding | AI runs `search_assets.py` and reads only the matched `#Lline` block |
+| **Style Lock-In** | Colors, proportions, and old game glue (`i18n`, `battle`) leak into new games | Decoupled **Universal Base (`templates/`)** + swappable **Style Packs (`styles/<id>/`)** |
+| **Visual Browsing** | Either no preview or dozens of stale `.png` files bloating the Skill | Live **Zero-PNG Showroom (`showroom/gallery.html`)** importing real source code |
+| **Cross-Project Reuse** | Duplicated skills or broken imports across games | Incremental merge into one domain Skill + `--sync-lines` validation |
+
+---
+
+## How It Works
+
+```text
+Old Game Repo ──▶ [Step 0: Silent Scan & 4-Question Alignment Gate]
+                       │
+                       ├──▶ Skip Project Glue (save/story/SDK)
+                       │
+                       ├──▶ templates/ ("style": "universal", stripped imports)
+                       ├──▶ styles/<id>/ (palette, CSS tokens, post-processing)
+                       ├──▶ assets-catalog.json + scripts/search_assets.py (--sync-lines)
+                       └──▶ showroom/gallery.html (Zero-PNG live browser preview)
+```
+
+### Real CLI Output Example
+
+```bash
+$ python scripts/search_assets.py --q spring
+Matched 2 UI asset(s):
+- [interaction | universal] 弹簧按钮按压反馈 (Event-Driven Spring Button Feedback) -> templates/core/button-feedback.js#L4 `initializeButtonFeedback`
+    Zero game-loop overhead spring press/rebound micro-interaction using Web Animations API with reduced-motion and keyboard support.
+```
 
 ---
 
@@ -74,7 +97,7 @@ Use extracting-asset-skill to extract the frosted-glass theme and drawer toolbar
 
 ```text
 skills/extracting-asset-skill/
-├── SKILL.md                           # Main workflow & Step 0 alignment gate
+├── SKILL.md                           # Main workflow & Step 0 alignment gate (< 80 lines)
 ├── references/
 │   ├── style-pack-pattern.md          # Universal Base + Style Pack & Zero-PNG Showroom architecture
 │   └── skill-spec-checklist.md        # Token economy & SKILL.md spec checklist
