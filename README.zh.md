@@ -32,15 +32,26 @@
 
 ## 核心工作流
 
-```text
-旧游戏项目 ──▶ [Step 0: 静默扫描 + 4 问对齐门控]
-                   │
-                   ├──▶ 自动跳过业务胶水（存档 / 剧情 / 渠道 SDK）
-                   │
-                   ├──▶ templates/（通用底座，剥离外部 import）
-                   ├──▶ styles/<id>/（色板、CSS 变量、光照后期参数）
-                   ├──▶ assets-catalog.json + scripts/search_assets.py（--sync-lines）
-                   └──▶ showroom/gallery.html（零 PNG 浏览器实时陈列室）
+```mermaid
+flowchart TD
+    A["旧游戏项目 (Three.js / Web UI / 2D)"] --> B["Step 0: 静默扫描与 4 问对齐门控"]
+    B --> C{"分拣代码"}
+    C -->|"业务胶水 (存档/剧情/SDK)"| D["跳过不抽"]
+    C -->|"高价值可复用资产"| E["Step 1: 剥离业务 import 与解耦"]
+
+    E --> F["templates/ 通用底座 (style: universal)"]
+    E --> G["styles/风格包/ (色板/比例/CSS 变量)"]
+
+    F --> H["Step 3: 生成 assets-catalog.json + search_assets.py"]
+    G --> H
+    H --> I["--sync-lines 校验行号 (0 警告)"]
+
+    I --> J["Step 4: showroom/gallery.html (零 PNG 实时陈列室)"]
+    I --> K["Step 5: 同步至中央资产库 (按领域增量合并)"]
+
+    K -->|"新游戏开发时"| L["AI 跑 CLI 检索 #L行号 (防上下文爆炸)"]
+    J -->|"人类浏览器预览"| M["360° 看 3D / 一键切 UI 皮肤"]
+    L --> N["下一款游戏起步提速 2-3 倍"]
 ```
 
 ### 终端检索实拍

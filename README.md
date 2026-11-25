@@ -32,15 +32,26 @@
 
 ## How It Works
 
-```text
-Old Game Repo ──▶ [Step 0: Silent Scan & 4-Question Alignment Gate]
-                       │
-                       ├──▶ Skip Project Glue (save/story/SDK)
-                       │
-                       ├──▶ templates/ ("style": "universal", stripped imports)
-                       ├──▶ styles/<id>/ (palette, CSS tokens, post-processing)
-                       ├──▶ assets-catalog.json + scripts/search_assets.py (--sync-lines)
-                       └──▶ showroom/gallery.html (Zero-PNG live browser preview)
+```mermaid
+flowchart TD
+    A["Finished Game Repo (Three.js / Web UI / 2D)"] --> B["Step 0: Silent Scan & 4-Question Alignment Gate"]
+    B --> C{"Classify Modules"}
+    C -->|"Project Glue (Save / Story / SDK)"| D["Skip"]
+    C -->|"High-Value Reusable Assets"| E["Step 1: Strip Business Imports & Decouple"]
+
+    E --> F["templates/ Universal Base (style: universal)"]
+    E --> G["styles/id/ Style Pack (Palette / CSS / Post)"]
+
+    F --> H["Step 3: Build assets-catalog.json + search_assets.py"]
+    G --> H
+    H --> I["--sync-lines Verification (0 Warnings)"]
+
+    I --> J["Step 4: showroom/gallery.html (Zero-PNG Live Showroom)"]
+    I --> K["Step 5: Sync to Central Asset Vault (Incremental Merge)"]
+
+    K -->|"New Game Project"| L["AI Queries #Lline via CLI (Zero Context Bloat)"]
+    J -->|"Human Browser Preview"| M["360° 3D Orbit / Live UI Theme Switcher"]
+    L --> N["2-3x Faster Kickoff on Next Game"]
 ```
 
 ### Real CLI Output Example
